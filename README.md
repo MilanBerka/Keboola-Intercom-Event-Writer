@@ -1,6 +1,6 @@
 # Keboola-Intercom-Event-Writer
 
-This uploads Liftago specific events from Keboola into Intercom. 
+Keboola-Intercom-Event-Writer uploads Liftago specific events from Keboola into Intercom. 
 
 ## Keboola Config JSON:
 - `personalAccessToken`: Intercom's Personal Access Token, that identifies the app
