@@ -38,7 +38,7 @@ orderJoinedTable = orderBasicTable.merge(orderOfferTable,how='left',left_on='ord
 # No-offer-orders
 noOfferOrders = orderJoinedTable.loc[pd.isnull(orderJoinedTable['order_last2000_pk']),['orderId','passengerId','createdAt_UNIX','orderState']]
 noOfferOrders = noOfferOrders[~pd.isnull(noOfferOrders['passengerId'])]
-finishedRides = rideBasicTable.loc[rideBasicTable['rideState']=='FINISHED',['orderId','rideId','passengerId','orderedAt_UNIX']]
+finishedRides = rideBasicTable.loc[rideBasicTable['rideState']=='FINISHED',['orderId','rideId','passengerId','orderedAt_UNIX','finishedAt_UNIX']]
 finishedRides = finishedRides[~pd.isnull(finishedRides['passengerId'])]
 
 """ 3: INTERCOM JSON CREATION """
@@ -60,7 +60,7 @@ def IO_finishedRide(row):
     bulkExportList.append(
     {
         'event_name': 'finished-ride',
-        'created_at': int(row['orderedAt_UNIX']),
+        'created_at': int(row['finishedAt_UNIX']),
         'user_id': str(int(row['passengerId'])),
         'metadata': {
             'ORDEREDAT_DATE': int(row['orderedAt_UNIX']),
