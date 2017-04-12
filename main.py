@@ -36,7 +36,7 @@ orderOfferTable['offeredAt_UNIX'] = orderOfferTable['offeredAt'].astype(np.int64
 orderJoinedTable = orderBasicTable.merge(orderOfferTable,how='left',left_on='orderId',right_on='order_last2000_pk')
 
 # No-offer-orders
-noOfferOrders = orderJoinedTable.loc[pd.isnull(orderJoinedTable['order_last2000_pk']),['orderId','passengerId','createdAt_UNIX','orderState']]
+noOfferOrders = orderJoinedTable.loc[pd.isnull(orderJoinedTable['order_last2000_pk']),['orderId','passengerId','createdAt_UNIX','orderState','region']]
 noOfferOrders = noOfferOrders[~pd.isnull(noOfferOrders['passengerId'])]
 finishedRides = rideBasicTable.loc[rideBasicTable['rideState']=='FINISHED',['orderId','rideId','passengerId','orderedAt_UNIX','finishedAt_UNIX']]
 finishedRides = finishedRides[~pd.isnull(finishedRides['passengerId'])]
@@ -52,10 +52,24 @@ def IO_noOfferOrder(row):
         'user_id': str(int(row['passengerId'])),
         'metadata': {
             'ORDER_ID': str(row['orderId']),
-            'STATE': row['orderState']
+            'STATE': row['orderState'],
+            'CITY':row['region']
         }
-    })           
-            
+    }) 
+    
+def IO_noOfferOrderPrague(row):
+    bulkExportList.append(
+    {
+        'event_name': 'no-offer-order-prague',
+        'created_at': int(row['createdAt_UNIX']),
+        'user_id': str(int(row['passengerId'])),
+        'metadata': {
+            'ORDER_ID': str(row['orderId']),
+            'STATE': row['orderState'],
+            'CITY':row['region']
+        }
+    })  
+    
 def IO_finishedRide(row):
     bulkExportList.append(
     {
@@ -70,6 +84,7 @@ def IO_finishedRide(row):
     })               
             
 noOfferOrders.apply(IO_noOfferOrder,axis=1)
+noOfferOrders.apply(IO_noOfferOrderPrague,axis=1)
 finishedRides.apply(IO_finishedRide,axis=1)    
 
 """ 4: INTERCOM API HIT """
